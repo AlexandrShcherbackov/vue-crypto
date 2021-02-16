@@ -36,6 +36,7 @@
         <hr class="w-full border-t border-gray-600 my-4" />
         <CurrencyGrid
           :currencies="currsForRender"
+          :current="currentCurr"
           @delete="deleteHandler"
           @setCurrentCurr="setCurrentCurrHandler"
           class="mt-5"
@@ -44,7 +45,12 @@
       </template>
       <p v-else>Нет ни одной записи</p>
 
-      <CryptoGraph :currentCurr="currentCurr" :historyData="currentHistory" />
+      <CryptoGraph
+        v-if="currentCurr"
+        :currentCurr="currentCurr"
+        :historyData="currentHistory"
+        @closeGraph="closeGrapHandler"
+      />
     </div>
   </div>
 </template>
@@ -132,6 +138,9 @@ export default {
     },
     setCurrentCurrHandler(v) {
       this.currentCurr = v;
+    },
+    closeGrapHandler() {
+      this.setCurrentCurrHandler(null);
     },
   },
 };

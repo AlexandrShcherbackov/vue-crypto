@@ -11,7 +11,7 @@
         class="bg-purple-800 border w-10"
       ></div>
     </div>
-    <button type="button" class="absolute top-0 right-0">
+    <button type="button" class="absolute top-0 right-0" @click="closeGraph">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -55,6 +55,9 @@ export default {
       const max = Math.max(...this.historyData);
       const min = Math.min(...this.historyData);
       return ((value - min) * 90) / (max - min);
+    },
+    closeGraph() {
+      this.$emit('closeGraph');
     },
   },
 };

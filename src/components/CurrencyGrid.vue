@@ -3,7 +3,7 @@
     <div
       v-for="t in currencies"
       :key="t.curr"
-      @click="clickHandler(t)"
+      @click="clickHandler(t.curr)"
       :class="{ 'border-4': t.curr === current }"
       class="bg-white overflow-hidden shadow rounded-lg border-purple-800 border-solid cursor-pointer"
     >
@@ -47,11 +47,10 @@ export default {
       type: Array,
       default: () => [],
     },
-  },
-  data() {
-    return {
-      current: null,
-    };
+    current: {
+      type: String,
+      default: '',
+    },
   },
   methods: {
     deleteHandler(id) {
@@ -61,8 +60,7 @@ export default {
       return currencyFilter(c);
     },
     clickHandler(c) {
-      this.current = this.current === c.curr ? null : c.curr;
-      this.$emit('setCurrentCurr', this.current);
+      this.$emit('setCurrentCurr', c);
     },
   },
 };
