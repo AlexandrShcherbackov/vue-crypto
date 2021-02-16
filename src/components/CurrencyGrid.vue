@@ -3,6 +3,8 @@
     <div
       v-for="t in currencies"
       :key="t.curr"
+      @click="clickHandler(t)"
+      :class="{ 'border-4': t.curr === current }"
       class="bg-white overflow-hidden shadow rounded-lg border-purple-800 border-solid cursor-pointer"
     >
       <div class="px-4 py-5 sm:p-6 text-center">
@@ -10,12 +12,12 @@
           {{ t.curr }}
         </dt>
         <dd class="mt-1 text-3xl font-semibold text-gray-900">
-          {{ Number(t.value).toFixed(2) }}
+          {{ currencyFilter(Number(t.value)) }}
         </dd>
       </div>
       <div class="w-full border-t border-gray-200"></div>
       <button
-        @click="deleteHandler(t.curr)"
+        @click.stop="deleteHandler(t.curr)"
         class="flex items-center justify-center font-medium w-full bg-gray-100 px-4 py-4 sm:px-6 text-md text-gray-500 hover:text-gray-600 hover:bg-gray-200 hover:opacity-20 transition-all focus:outline-none"
       >
         <svg
@@ -37,6 +39,8 @@
 </template>
 
 <script>
+import currencyFilter from '@/utils/currency.filter';
+
 export default {
   props: {
     currencies: {
@@ -44,9 +48,21 @@ export default {
       default: () => [],
     },
   },
+  data() {
+    return {
+      current: null,
+    };
+  },
   methods: {
     deleteHandler(id) {
       this.$emit('delete', id);
+    },
+    currencyFilter(c) {
+      return currencyFilter(c);
+    },
+    clickHandler(c) {
+      this.current = this.current === c.curr ? null : c.curr;
+      this.$emit('setCurrentCurr', this.current);
     },
   },
 };
