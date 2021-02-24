@@ -5,6 +5,7 @@ export default createStore({
   state: {
     currencies: [],
     currenciesHistoryData: [],
+    tickers: [],
   },
   getters: {
     getCurrencies({ currencies }) {
@@ -12,6 +13,9 @@ export default createStore({
     },
     getCurrenciesHistory({ currenciesHistoryData }) {
       return currenciesHistoryData;
+    },
+    getTickers({ tickers }) {
+      return tickers;
     },
   },
   mutations: {
@@ -39,6 +43,9 @@ export default createStore({
         });
       });
     },
+    setTickers(state, payload) {
+      state.tickers = Object.keys(payload);
+    },
   },
   actions: {
     async loadCurrencies({ commit }, { bases, nominals }) {
@@ -51,6 +58,14 @@ export default createStore({
         const currs = Object.entries(data);
         commit('setCurrencies', currs);
         commit('addHistory', currs);
+      });
+    },
+    async loadTickersNames({ commit }) {
+      const apyKey = process.env.VUE_APP_CURRENCY;
+      const url = `https://min-api.cryptocompare.com/data/blockchain/list?api_key=${apyKey}`;
+
+      await axios.get(url).then(({ data: { Data } }) => {
+        commit('setTickers', Data);
       });
     },
   },

@@ -8,6 +8,7 @@
           <LabelInput
             v-model="currentTicker"
             :hasError="tickerError"
+            :helper="tickersHelper"
             label="Тикер"
             placeholder="Например DOGE"
             errorMessage="Такой тикер уже добавлен"
@@ -90,6 +91,7 @@ export default {
   },
   async mounted() {
     await this.loadCurrencies(this.tickers);
+    await this.loadTickersNames();
     this.isLoading = false;
     this.loadData = setInterval(
       async () => await this.loadCurrencies(this.tickers),
@@ -103,6 +105,7 @@ export default {
     ...mapGetters({
       currencies: 'getCurrencies',
       currenciesHistory: 'getCurrenciesHistory',
+      allTickers: 'getTickers',
     }),
     currsForRender() {
       return this.currencies.flatMap(([base, nominals]) =>
@@ -124,6 +127,13 @@ export default {
         ({ base }) => base === this.currentCurr
       )?.values;
     },
+    tickersHelper() {
+      return this.currentTicker
+        ? this.allTickers.filter((i) =>
+            i.includes(this.currentTicker.toUpperCase())
+          )
+        : [];
+    },
   },
   watch: {
     tickers: {
@@ -141,6 +151,7 @@ export default {
   methods: {
     ...mapActions({
       loadCurrencies: 'loadCurrencies',
+      loadTickersNames: 'loadTickersNames',
     }),
     isTickerAlreadyUse() {
       return !!this.currencies.find(
