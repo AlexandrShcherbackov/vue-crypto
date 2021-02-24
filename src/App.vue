@@ -1,13 +1,16 @@
 <template>
   <div class="container mx-auto flex flex-col items-center bg-gray-100 p-4">
+    <Preloader v-show="isLoading" />
     <div class="container">
       <div class="w-full my-4"></div>
       <section>
         <div class="flex">
           <LabelInput
             v-model="currentTicker"
+            :hasError="tickerError"
             label="Тикер"
             placeholder="Например DOGE"
+            errorMessage="Такой тикер уже добавлен"
           />
         </div>
         <button
@@ -62,12 +65,14 @@ import { mapActions, mapGetters } from 'vuex';
 import LabelInput from '@/components/LabelInput';
 import CurrencyGrid from '@/components/CurrencyGrid';
 import CryptoGraph from '@/components/CryptoGraph';
+import Preloader from '@/components/Preloader';
 
 export default {
   components: {
     LabelInput,
     CurrencyGrid,
     CryptoGraph,
+    Preloader,
   },
   data() {
     return {
@@ -79,10 +84,13 @@ export default {
       },
       excludeTickers: [],
       loadData: null,
+      isLoading: true,
+      tickerError: false,
     };
   },
   async mounted() {
     await this.loadCurrencies(this.tickers);
+    this.isLoading = false;
     this.loadData = setInterval(
       async () => await this.loadCurrencies(this.tickers),
       10000
@@ -122,6 +130,11 @@ export default {
       deep: true,
       async handler(v) {
         await this.loadCurrencies(v);
+        clearInterval(this.loadData);
+        this.loadData = setInterval(
+          async () => await this.loadCurrencies(this.tickers),
+          10000
+        );
       },
     },
   },
@@ -129,7 +142,18 @@ export default {
     ...mapActions({
       loadCurrencies: 'loadCurrencies',
     }),
+    isTickerAlreadyUse() {
+      return !!this.currencies.find(
+        ([t]) => t === this.currentTicker.toUpperCase()
+      );
+    },
     addTicker() {
+      if (this.isTickerAlreadyUse()) {
+        this.tickerError = true;
+        return;
+      }
+
+      this.tickerError = false;
       this.tickers.bases.push(this.currentTicker);
     },
     deleteHandler(delCurr) {

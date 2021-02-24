@@ -14,6 +14,7 @@
         :placeholder="placeholder"
       />
     </div>
+    <div v-if="hasError" class="text-sm text-red-600">{{ errorMessage }}</div>
   </div>
 </template>
 
@@ -31,6 +32,14 @@ export default {
     modelValue: {
       type: [String, Number],
       default: '',
+    },
+    hasError: {
+      type: Boolean,
+      default: false,
+    },
+    errorMessage: {
+      type: String,
+      default: 'Error message!',
     },
   },
   methods: {
