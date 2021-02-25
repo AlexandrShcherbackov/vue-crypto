@@ -90,13 +90,17 @@ export default {
     };
   },
   async mounted() {
+    const tickers = JSON.parse(localStorage.getItem('crypto-tickers'));
+
+    if (tickers) {
+      this.tickers = tickers;
+    } else {
+      this.tickers.bases.push(this.currentTicker);
+      localStorage.setItem('crypto-tickers', JSON.stringify(this.tickers));
+    }
+
     await this.loadCurrencies(this.tickers);
-    await this.loadTickersNames();
-    this.isLoading = false;
-    this.loadData = setInterval(
-      async () => await this.loadCurrencies(this.tickers),
-      10000
-    );
+    await this.updateCurrencies();
   },
   deleted() {
     clearInterval(this.loadData);
@@ -140,11 +144,7 @@ export default {
       deep: true,
       async handler(v) {
         await this.loadCurrencies(v);
-        clearInterval(this.loadData);
-        this.loadData = setInterval(
-          async () => await this.loadCurrencies(this.tickers),
-          10000
-        );
+        await this.updateCurrencies();
       },
     },
   },
@@ -166,6 +166,7 @@ export default {
 
       this.tickerError = false;
       this.tickers.bases.push(this.currentTicker);
+      localStorage.setItem('crypto-tickers', JSON.stringify(this.tickers));
     },
     deleteHandler(delCurr) {
       const [base, nominal] = delCurr.split(' - ');
@@ -176,6 +177,17 @@ export default {
     },
     closeGrapHandler() {
       this.setCurrentCurrHandler(null);
+    },
+    updateCurrencies() {
+      if (this.loadData) {
+        clearInterval(this.loadData);
+      }
+
+      this.isLoading = false;
+      this.loadData = setInterval(
+        async () => await this.loadCurrencies(this.tickers),
+        10000
+      );
     },
   },
 };
