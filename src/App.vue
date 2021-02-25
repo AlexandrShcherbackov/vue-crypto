@@ -85,7 +85,7 @@ export default {
     );
 
     this.tickerFilter = tickerFilter ? tickerFilter : '';
-    this.currentPage = currentPage ? currentPage : 0;
+    this.currentPage = currentPage ? Number(currentPage) : 0;
 
     const tickers = JSON.parse(localStorage.getItem('crypto-tickers'));
 
