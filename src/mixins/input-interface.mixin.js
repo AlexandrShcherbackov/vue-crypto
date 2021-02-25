@@ -21,4 +21,10 @@ export default {
       default: () => [],
     },
   },
+  methods: {
+    inputHandler(v) {
+      const newVal = typeof v === 'object' ? v.target.value : v;
+      this.$emit('update:modelValue', newVal);
+    },
+  },
 };

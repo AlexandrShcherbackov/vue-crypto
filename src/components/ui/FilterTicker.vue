@@ -37,16 +37,23 @@ import inputInterface from '@/mixins/input-interface.mixin';
 import LabelInput from '@/components/inputs/LabelInput';
 
 export default {
+  props: {
+    page: {
+      type: Number,
+      default: 0,
+    },
+  },
   components: {
     LabelInput,
   },
   mixins: [inputInterface],
   methods: {
-    inputHandler(v) {
-      console.log(v);
+    stepBack() {
+      this.$emit('update:page', this.page - 1);
     },
-    stepBack() {},
-    stepForward() {},
+    stepForward() {
+      this.$emit('update:page', this.page + 1);
+    },
   },
 };
 </script>

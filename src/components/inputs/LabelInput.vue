@@ -8,8 +8,6 @@
         :value="value"
         @input="inputHandler($event.target.value)"
         type="text"
-        name="wallet"
-        id="wallet"
         autocomplete="off"
         class="block w-full pr-10 border-gray-300 text-gray-900 focus:outline-none focus:ring-gray-500 focus:border-gray-500 sm:text-sm rounded-md"
         :placeholder="placeholder"
@@ -47,7 +45,6 @@ export default {
   mixins: [inputInterface],
   methods: {
     inputHandler(v) {
-      console.log('labelinput', v);
       this.$emit('input', v);
     },
   },

@@ -12,7 +12,11 @@
             @addTicker="addTicker"
           />
 
-          <FilterTicker class="ml-8" />
+          <FilterTicker
+            v-model:modelValue="tickerFilter"
+            v-model:page="currentPage"
+            class="ml-8"
+          />
         </div>
       </section>
 
@@ -69,6 +73,8 @@ export default {
       loadData: null,
       isLoading: true,
       tickerError: false,
+      tickerFilter: '',
+      currentPage: 0,
     };
   },
   async mounted() {
@@ -94,26 +100,38 @@ export default {
       currenciesHistory: 'getCurrenciesHistory',
       allTickers: 'getTickers',
     }),
+
     currsForRender() {
-      return this.currencies.flatMap(([base, nominals]) =>
-        Object.keys(nominals)
-          .filter(
-            (k) =>
-              !this.excludeTickers.find(
-                ({ base: b, nominal }) => b === base && nominal === k
-              )
-          )
-          .map((k) => ({
-            curr: `${base} - ${k}`,
-            value: nominals[k],
-          }))
-      );
+      const startIndex = this.currentPage * 6;
+      const endIndex = (this.currentPage + 1) * 6;
+      return this.currencies
+        .filter(([base]) =>
+          this.tickerFilter
+            ? base.includes(this.tickerFilter.toUpperCase())
+            : true
+        )
+        .flatMap(([base, nominals]) =>
+          Object.keys(nominals)
+            .filter(
+              (k) =>
+                !this.excludeTickers.find(
+                  ({ base: b, nominal }) => b === base && nominal === k
+                )
+            )
+            .map((k) => ({
+              curr: `${base} - ${k}`,
+              value: nominals[k],
+            }))
+        )
+        .slice(startIndex, endIndex);
     },
+
     currentHistory() {
       return this.currenciesHistory.find(
         ({ base }) => base === this.currentCurr
       )?.values;
     },
+
     tickersHelper() {
       return this.currentTicker
         ? this.allTickers.filter((i) =>
@@ -136,11 +154,13 @@ export default {
       loadCurrencies: 'loadCurrencies',
       loadTickersNames: 'loadTickersNames',
     }),
+
     isTickerAlreadyUse() {
       return !!this.currencies.find(
         ([t]) => t === this.currentTicker.toUpperCase()
       );
     },
+
     addTicker() {
       if (this.isTickerAlreadyUse()) {
         this.tickerError = true;
@@ -151,16 +171,20 @@ export default {
       this.tickers.bases.push(this.currentTicker);
       localStorage.setItem('crypto-tickers', JSON.stringify(this.tickers));
     },
+
     deleteHandler(delCurr) {
       const [base, nominal] = delCurr.split(' - ');
       this.excludeTickers.push({ base, nominal });
     },
+
     setCurrentCurrHandler(v) {
       this.currentCurr = v;
     },
+
     closeGrapHandler() {
       this.setCurrentCurrHandler(null);
     },
+
     subscribeToUpdates() {
       if (this.loadData) {
         clearInterval(this.loadData);
