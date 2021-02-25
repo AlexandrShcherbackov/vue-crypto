@@ -50,6 +50,10 @@ export default {
       type: Number,
       default: 0,
     },
+    modelValue: {
+      type: String,
+      default: '',
+    },
   },
   components: {
     LabelInput,

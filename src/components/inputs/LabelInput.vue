@@ -14,11 +14,11 @@
       />
     </div>
     <div
-      v-show="!!helper.length"
+      v-show="!!hintArray.length"
       class="flex bg-white shadow-md p-1 rounded-md flex-wrap"
     >
       <span
-        v-for="item in helper"
+        v-for="item in hintArray"
         :key="item"
         @click="inputHandler(item)"
         class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
@@ -43,6 +43,13 @@ export default {
     },
   },
   mixins: [inputInterface],
+  computed: {
+    hintArray() {
+      return this.value
+        ? this.helper.filter((i) => i.includes(this.value.toUpperCase()))
+        : [];
+    },
+  },
   methods: {
     inputHandler(v) {
       this.$emit('input', v);

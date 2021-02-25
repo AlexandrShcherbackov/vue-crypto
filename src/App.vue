@@ -8,14 +8,15 @@
           <AddTicker
             v-model="currentTicker"
             :hasError="tickerError"
-            :helper="tickersHelper"
+            :helper="allTickers"
             @addTicker="addTicker"
           />
 
           <FilterTicker
-            v-model:modelValue="tickerFilter"
+            v-model="tickerFilter"
             v-model:page="currentPage"
             :maxPageCount="maxPageCount"
+            :helper="allTickers"
             class="ml-8"
           />
         </div>
@@ -24,7 +25,7 @@
       <template v-if="!!currsForRender.length">
         <hr class="w-full border-t border-gray-600 my-4" />
         <CurrencyGrid
-          :currencies="currsForRender"
+          :currencies="currentPageCurrs"
           :current="currentCurr"
           @delete="deleteHandler"
           @setCurrentCurr="setCurrentCurrHandler"
@@ -78,7 +79,14 @@ export default {
       currentPage: 0,
     };
   },
-  async mounted() {
+  created() {
+    const { tickerFilter, currentPage } = Object.fromEntries(
+      new URL(window.location).searchParams.entries()
+    );
+
+    this.tickerFilter = tickerFilter ? tickerFilter : '';
+    this.currentPage = currentPage ? currentPage : 0;
+
     const tickers = JSON.parse(localStorage.getItem('crypto-tickers'));
 
     if (tickers) {
@@ -87,7 +95,8 @@ export default {
       this.tickers.bases.push(this.currentTicker);
       localStorage.setItem('crypto-tickers', JSON.stringify(this.tickers));
     }
-
+  },
+  async mounted() {
     await this.loadCurrencies(this.tickers);
     await this.loadTickersNames();
     await this.subscribeToUpdates();
@@ -103,8 +112,6 @@ export default {
     }),
 
     currsForRender() {
-      const startIndex = this.currentPage * 6;
-      const endIndex = (this.currentPage + 1) * 6;
       return this.currencies
         .filter(([base]) =>
           this.tickerFilter
@@ -123,8 +130,13 @@ export default {
               curr: `${base} - ${k}`,
               value: nominals[k],
             }))
-        )
-        .slice(startIndex, endIndex);
+        );
+    },
+
+    currentPageCurrs() {
+      const startIndex = this.currentPage * 6;
+      const endIndex = (this.currentPage + 1) * 6;
+      return this.currsForRender.slice(startIndex, endIndex);
     },
 
     currentHistory() {
@@ -133,16 +145,8 @@ export default {
       )?.values;
     },
 
-    tickersHelper() {
-      return this.currentTicker
-        ? this.allTickers.filter((i) =>
-            i.includes(this.currentTicker.toUpperCase())
-          )
-        : [];
-    },
-
     maxPageCount() {
-      return Math.ceil(this.currencies.length / 6);
+      return Math.floor(this.currsForRender.length / 6);
     },
   },
   watch: {
@@ -152,6 +156,21 @@ export default {
         await this.loadCurrencies(v);
         await this.subscribeToUpdates();
       },
+    },
+    tickerFilter() {
+      this.currentPage = 0;
+      window.history.pushState(
+        null,
+        document.title,
+        `${window.location.pathname}?tickerFilter=${this.tickerFilter}&currentPage=${this.currentPage}`
+      );
+    },
+    currentPage() {
+      window.history.pushState(
+        null,
+        document.title,
+        `${window.location.pathname}?tickerFilter=${this.tickerFilter}&currentPage=${this.currentPage}`
+      );
     },
   },
   methods: {
