@@ -142,7 +142,7 @@ export default {
     },
 
     maxPageCount() {
-      return Math.ceil(this.currsForRender.length / 6);
+      return Math.ceil(this.currencies.length / 6);
     },
   },
   watch: {
