@@ -5,7 +5,7 @@
     </label>
     <div class="mt-1 relative rounded-md shadow-md">
       <input
-        :value="modelValue"
+        :value="value"
         @input="inputHandler($event.target.value)"
         type="text"
         name="wallet"
@@ -34,36 +34,21 @@
 </template>
 
 <script>
+// mixins
+import inputInterface from '@/mixins/input-interface.mixin';
+
 export default {
   props: {
-    label: {
-      type: String,
-      default: '',
-    },
-    placeholder: {
-      type: String,
-      default: '',
-    },
-    modelValue: {
+    value: {
       type: [String, Number],
       default: '',
     },
-    hasError: {
-      type: Boolean,
-      default: false,
-    },
-    errorMessage: {
-      type: String,
-      default: 'Error message!',
-    },
-    helper: {
-      type: Array,
-      default: () => [],
-    },
   },
+  mixins: [inputInterface],
   methods: {
     inputHandler(v) {
-      this.$emit('update:modelValue', v);
+      console.log('labelinput', v);
+      this.$emit('input', v);
     },
   },
 };

@@ -5,35 +5,15 @@
       <div class="w-full my-4"></div>
       <section>
         <div class="flex">
-          <LabelInput
+          <AddTicker
             v-model="currentTicker"
             :hasError="tickerError"
             :helper="tickersHelper"
-            label="Тикер"
-            placeholder="Например DOGE"
-            errorMessage="Такой тикер уже добавлен"
+            @addTicker="addTicker"
           />
+
+          <FilterTicker class="ml-8" />
         </div>
-        <button
-          @click="addTicker"
-          type="button"
-          class="my-4 inline-flex items-center py-2 px-4 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-full text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-        >
-          <!-- Heroicon name: solid/mail -->
-          <svg
-            class="-ml-0.5 mr-2 h-6 w-6"
-            xmlns="http://www.w3.org/2000/svg"
-            width="30"
-            height="30"
-            viewBox="0 0 24 24"
-            fill="#ffffff"
-          >
-            <path
-              d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
-            ></path>
-          </svg>
-          Добавить
-        </button>
       </section>
 
       <template v-if="!!currsForRender.length">
@@ -63,17 +43,19 @@
 import { mapActions, mapGetters } from 'vuex';
 
 //components
-import LabelInput from '@/components/LabelInput';
+import AddTicker from '@/components/ui/AddTicker';
 import CurrencyGrid from '@/components/CurrencyGrid';
 import CryptoGraph from '@/components/CryptoGraph';
 import Preloader from '@/components/Preloader';
+import FilterTicker from '@/components/ui/FilterTicker';
 
 export default {
   components: {
-    LabelInput,
+    AddTicker,
     CurrencyGrid,
     CryptoGraph,
     Preloader,
+    FilterTicker,
   },
   data() {
     return {
@@ -100,7 +82,8 @@ export default {
     }
 
     await this.loadCurrencies(this.tickers);
-    await this.updateCurrencies();
+    await this.loadTickersNames();
+    await this.subscribeToUpdates();
   },
   deleted() {
     clearInterval(this.loadData);
@@ -144,7 +127,7 @@ export default {
       deep: true,
       async handler(v) {
         await this.loadCurrencies(v);
-        await this.updateCurrencies();
+        await this.subscribeToUpdates();
       },
     },
   },
@@ -178,7 +161,7 @@ export default {
     closeGrapHandler() {
       this.setCurrentCurrHandler(null);
     },
-    updateCurrencies() {
+    subscribeToUpdates() {
       if (this.loadData) {
         clearInterval(this.loadData);
       }
