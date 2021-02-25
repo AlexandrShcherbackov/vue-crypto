@@ -15,6 +15,7 @@
           <FilterTicker
             v-model:modelValue="tickerFilter"
             v-model:page="currentPage"
+            :maxPageCount="maxPageCount"
             class="ml-8"
           />
         </div>
@@ -138,6 +139,10 @@ export default {
             i.includes(this.currentTicker.toUpperCase())
           )
         : [];
+    },
+
+    maxPageCount() {
+      return Math.ceil(this.currsForRender.length / 6);
     },
   },
   watch: {

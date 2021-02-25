@@ -42,6 +42,10 @@ export default {
       type: Number,
       default: 0,
     },
+    maxPageCount: {
+      type: Number,
+      default: 0,
+    },
   },
   components: {
     LabelInput,
@@ -49,9 +53,15 @@ export default {
   mixins: [inputInterface],
   methods: {
     stepBack() {
+      if (this.page === 0) {
+        return;
+      }
       this.$emit('update:page', this.page - 1);
     },
     stepForward() {
+      if (this.page === this.maxPageCount) {
+        return;
+      }
       this.$emit('update:page', this.page + 1);
     },
   },
