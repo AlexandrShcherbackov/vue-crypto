@@ -148,7 +148,7 @@ export default {
     },
 
     maxPageCount() {
-      return Math.floor(this.currsForRender.length / 6);
+      return Math.floor(this.currsForRender.length / 7);
     },
 
     navigationData() {
@@ -202,8 +202,13 @@ export default {
     }),
 
     isTickerAlreadyUse() {
-      return !!this.currencies.find(
-        ([t]) => t === this.currentTicker.toUpperCase()
+      return (
+        !!this.currencies.find(
+          ([t]) => t === this.currentTicker.toUpperCase()
+        ) &&
+        !this.excludeTickers.find(
+          ({ base }) => base === this.currentTicker.toUpperCase()
+        )
       );
     },
 
@@ -215,6 +220,9 @@ export default {
 
       this.tickerError = false;
       this.tickers.bases.push(this.currentTicker);
+      this.excludeTickers = this.excludeTickers.filter(
+        ({ base }) => base !== this.currentTicker.toUpperCase()
+      );
       localStorage.setItem('crypto-tickers', JSON.stringify(this.tickers));
     },
 
