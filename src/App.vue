@@ -157,6 +157,7 @@ export default {
         await this.subscribeToUpdates();
       },
     },
+
     tickerFilter() {
       this.currentPage = 0;
       window.history.pushState(
@@ -165,12 +166,19 @@ export default {
         `${window.location.pathname}?tickerFilter=${this.tickerFilter}&currentPage=${this.currentPage}`
       );
     },
+
     currentPage() {
       window.history.pushState(
         null,
         document.title,
         `${window.location.pathname}?tickerFilter=${this.tickerFilter}&currentPage=${this.currentPage}`
       );
+    },
+
+    currentPageCurrs() {
+      if (this.currentPageCurrs.length === 0 && this.currentPage > 0) {
+        this.currentPage -= 1;
+      }
     },
   },
   methods: {
@@ -199,6 +207,10 @@ export default {
     deleteHandler(delCurr) {
       const [base, nominal] = delCurr.split(' - ');
       this.excludeTickers.push({ base, nominal });
+
+      if (this.currentCurr === delCurr) {
+        this.closeGrapHandler();
+      }
     },
 
     setCurrentCurrHandler(v) {
