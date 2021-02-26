@@ -22,7 +22,7 @@
         </div>
       </section>
 
-      <template v-if="!!currsForRender.length">
+      <template v-if="!!currentPageCurrs.length">
         <hr class="w-full border-t border-gray-600 my-4" />
         <CurrencyGrid
           :currencies="currentPageCurrs"
@@ -148,6 +148,13 @@ export default {
     maxPageCount() {
       return Math.floor(this.currsForRender.length / 6);
     },
+
+    navigationData() {
+      return {
+        tickerFilter: this.tickerFilter,
+        currentPage: this.currentPage,
+      };
+    },
   },
   watch: {
     tickers: {
@@ -160,14 +167,9 @@ export default {
 
     tickerFilter() {
       this.currentPage = 0;
-      window.history.pushState(
-        null,
-        document.title,
-        `${window.location.pathname}?tickerFilter=${this.tickerFilter}&currentPage=${this.currentPage}`
-      );
     },
 
-    currentPage() {
+    navigationData() {
       window.history.pushState(
         null,
         document.title,
