@@ -88,12 +88,14 @@ export default {
     this.currentPage = currentPage ? Number(currentPage) : 0;
 
     const tickers = JSON.parse(localStorage.getItem('crypto-tickers'));
+    const excludeTickers = JSON.parse(localStorage.getItem('crypto-excluded'));
 
     if (tickers) {
       this.tickers = tickers;
-    } else {
-      this.tickers.bases.push(this.currentTicker);
-      localStorage.setItem('crypto-tickers', JSON.stringify(this.tickers));
+    }
+
+    if (excludeTickers) {
+      this.excludeTickers = excludeTickers;
     }
   },
   async mounted() {
@@ -162,6 +164,16 @@ export default {
       async handler(v) {
         await this.loadCurrencies(v);
         await this.subscribeToUpdates();
+      },
+    },
+
+    excludeTickers: {
+      deep: true,
+      handler() {
+        localStorage.setItem(
+          'crypto-excluded',
+          JSON.stringify(this.excludeTickers)
+        );
       },
     },
 
