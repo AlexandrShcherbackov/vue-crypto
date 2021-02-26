@@ -5,9 +5,9 @@
     </h3>
     <div class="flex items-end border-gray-600 border-b border-l h-64">
       <div
-        v-for="(value, idx) in historyData"
+        v-for="(value, idx) in normolizedGraph"
         :key="idx"
-        :style="{ height: `${calculateBar(value)}%` }"
+        :style="{ height: `${value}%` }"
         class="bg-purple-800 border w-10"
       ></div>
     </div>
@@ -49,13 +49,16 @@ export default {
       default: '',
     },
   },
-  methods: {
-    calculateBar(value) {
-      console.log(value);
+  computed: {
+    normolizedGraph() {
       const max = Math.max(...this.historyData);
       const min = Math.min(...this.historyData);
-      return ((value - min) * 90) / (max - min);
+      return this.historyData.map(
+        (value) => ((value - min) * 90) / (max - min)
+      );
     },
+  },
+  methods: {
     closeGraph() {
       this.$emit('closeGraph');
     },
