@@ -8,15 +8,12 @@ export default createStore({
     tickers: [],
   },
   getters: {
-    getCurrencies({ currencies }) {
-      return currencies;
-    },
-    getCurrenciesHistory({ currenciesHistoryData }) {
-      return currenciesHistoryData;
-    },
-    getTickers({ tickers }) {
-      return tickers;
-    },
+    getCurrByBase: ({ currencies }) => (base) =>
+      currencies.find(([t]) => t === base),
+    getFiltredCurrencies: ({ currencies }) => (ticker) =>
+      currencies.filter(([base]) => (ticker ? base.includes(ticker) : true)),
+    getHistoryByCurrBase: ({ currenciesHistoryData }) => (currBase) =>
+      currenciesHistoryData.find(({ base }) => base === currBase)?.values,
   },
   mutations: {
     setCurrencies(state, payload) {

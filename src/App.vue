@@ -46,7 +46,7 @@
 </template>
 <script>
 // vuex binding
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 //components
 import AddTicker from '@/components/ui/AddTicker';
@@ -103,24 +103,22 @@ export default {
     await this.loadTickersNames();
     await this.subscribeToUpdates();
   },
-  deleted() {
+  unmounted() {
     clearInterval(this.loadData);
   },
   computed: {
+    ...mapState({
+      allTickers: 'tickers',
+    }),
     ...mapGetters({
-      currencies: 'getCurrencies',
-      currenciesHistory: 'getCurrenciesHistory',
-      allTickers: 'getTickers',
+      getFiltredCurrencies: 'getFiltredCurrencies',
+      currenciesHistory: 'getHistoryByCurrBase',
+      getCurrByBase: 'getCurrByBase',
     }),
 
     currsForRender() {
-      return this.currencies
-        .filter(([base]) =>
-          this.tickerFilter
-            ? base.includes(this.tickerFilter.toUpperCase())
-            : true
-        )
-        .flatMap(([base, nominals]) =>
+      return this.getFiltredCurrencies(this.tickerFilter.toUpperCase()).flatMap(
+        ([base, nominals]) =>
           Object.keys(nominals)
             .filter(
               (k) =>
@@ -132,7 +130,7 @@ export default {
               curr: `${base} - ${k}`,
               value: nominals[k],
             }))
-        );
+      );
     },
 
     currentPageCurrs() {
@@ -142,9 +140,7 @@ export default {
     },
 
     currentHistory() {
-      return this.currenciesHistory.find(
-        ({ base }) => base === this.currentCurr
-      )?.values;
+      return this.currenciesHistory(this.currentCurr);
     },
 
     maxPageCount() {
@@ -203,9 +199,7 @@ export default {
 
     isTickerAlreadyUse() {
       return (
-        !!this.currencies.find(
-          ([t]) => t === this.currentTicker.toUpperCase()
-        ) &&
+        !!this.getCurrByBase(this.currentTicker.toUpperCase()) &&
         !this.excludeTickers.find(
           ({ base }) => base === this.currentTicker.toUpperCase()
         )
