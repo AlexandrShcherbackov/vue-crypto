@@ -55,6 +55,9 @@ import CryptoGraph from '@/components/CryptoGraph';
 import Preloader from '@/components/Preloader';
 import FilterTicker from '@/components/ui/FilterTicker';
 
+// utils
+import { locationSeacrParamsObject } from '@/utils/url.helper';
+
 export default {
   components: {
     AddTicker,
@@ -80,9 +83,7 @@ export default {
     };
   },
   created() {
-    const { tickerFilter, currentPage } = Object.fromEntries(
-      new URL(window.location).searchParams.entries()
-    );
+    const { tickerFilter, currentPage } = locationSeacrParamsObject();
 
     this.tickerFilter = tickerFilter ? tickerFilter : '';
     this.currentPage = currentPage ? Number(currentPage) : 0;
