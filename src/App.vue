@@ -45,6 +45,9 @@
   </div>
 </template>
 <script>
+// [] 1. При добавлении удалённого тикера в ticker.base добавляется база, которая там есть
+// [] 2. Для удалённых пар тиккер - валюта продолжают отправляться запросы на обновление данных
+
 // vuex binding
 import { mapActions, mapGetters, mapState } from 'vuex';
 
@@ -54,6 +57,9 @@ import CurrencyGrid from '@/components/CurrencyGrid';
 import CryptoGraph from '@/components/CryptoGraph';
 import Preloader from '@/components/Preloader';
 import FilterTicker from '@/components/ui/FilterTicker';
+
+// utils
+import { locationSeacrParamsObject } from '@/utils/url.helper';
 
 export default {
   components: {
@@ -80,23 +86,8 @@ export default {
     };
   },
   created() {
-    const { tickerFilter, currentPage } = Object.fromEntries(
-      new URL(window.location).searchParams.entries()
-    );
-
-    this.tickerFilter = tickerFilter ? tickerFilter : '';
-    this.currentPage = currentPage ? Number(currentPage) : 0;
-
-    const tickers = JSON.parse(localStorage.getItem('crypto-tickers'));
-    const excludeTickers = JSON.parse(localStorage.getItem('crypto-excluded'));
-
-    if (tickers) {
-      this.tickers = tickers;
-    }
-
-    if (excludeTickers) {
-      this.excludeTickers = excludeTickers;
-    }
+    this.initializeFilters();
+    this.initializeData();
   },
   async mounted() {
     await this.loadCurrencies(this.tickers);
@@ -247,6 +238,28 @@ export default {
         async () => await this.loadCurrencies(this.tickers),
         10000
       );
+    },
+
+    initializeFilters() {
+      const { tickerFilter, currentPage } = locationSeacrParamsObject();
+
+      this.tickerFilter = tickerFilter ? tickerFilter : '';
+      this.currentPage = currentPage ? Number(currentPage) : 0;
+    },
+
+    initializeData() {
+      const tickers = JSON.parse(localStorage.getItem('crypto-tickers'));
+      const excludeTickers = JSON.parse(
+        localStorage.getItem('crypto-excluded')
+      );
+
+      if (tickers) {
+        this.tickers = tickers;
+      }
+
+      if (excludeTickers) {
+        this.excludeTickers = excludeTickers;
+      }
     },
   },
 };
