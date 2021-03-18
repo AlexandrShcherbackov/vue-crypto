@@ -83,21 +83,8 @@ export default {
     };
   },
   created() {
-    const { tickerFilter, currentPage } = locationSeacrParamsObject();
-
-    this.tickerFilter = tickerFilter ? tickerFilter : '';
-    this.currentPage = currentPage ? Number(currentPage) : 0;
-
-    const tickers = JSON.parse(localStorage.getItem('crypto-tickers'));
-    const excludeTickers = JSON.parse(localStorage.getItem('crypto-excluded'));
-
-    if (tickers) {
-      this.tickers = tickers;
-    }
-
-    if (excludeTickers) {
-      this.excludeTickers = excludeTickers;
-    }
+    this.initializeFilters();
+    this.initializeData();
   },
   async mounted() {
     await this.loadCurrencies(this.tickers);
@@ -254,6 +241,28 @@ export default {
         async () => await this.loadCurrencies(this.tickers),
         10000
       );
+    },
+
+    initializeFilters() {
+      const { tickerFilter, currentPage } = locationSeacrParamsObject();
+
+      this.tickerFilter = tickerFilter ? tickerFilter : '';
+      this.currentPage = currentPage ? Number(currentPage) : 0;
+    },
+
+    initializeData() {
+      const tickers = JSON.parse(localStorage.getItem('crypto-tickers'));
+      const excludeTickers = JSON.parse(
+        localStorage.getItem('crypto-excluded')
+      );
+
+      if (tickers) {
+        this.tickers = tickers;
+      }
+
+      if (excludeTickers) {
+        this.excludeTickers = excludeTickers;
+      }
     },
   },
 };
