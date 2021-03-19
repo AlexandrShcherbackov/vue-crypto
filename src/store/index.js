@@ -1,5 +1,5 @@
 import { createStore } from 'vuex';
-import { loadCurrencies, loadTickersNames } from '@/api';
+import { loadTickers, loadTickersNames } from '@/api';
 
 export default createStore({
   state: {
@@ -46,7 +46,7 @@ export default createStore({
   },
   actions: {
     async loadCurrencies({ commit }, { bases, nominals }) {
-      await loadCurrencies(bases, nominals).then((currs) => {
+      await loadTickers(bases, nominals).then((currs) => {
         commit('setCurrencies', currs);
         commit('addHistory', currs);
       });

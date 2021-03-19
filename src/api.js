@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const loadCurrencies = async (bases, nominals) => {
+export const loadTickers = async (bases, nominals) => {
   const apyKey = process.env.VUE_APP_CURRENCY;
   const tsyms = nominals.join(',');
   const fsyms = bases.join(',');

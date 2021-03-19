@@ -197,7 +197,7 @@ export default {
       );
     },
 
-    addTicker() {
+    addTickerHandler() {
       if (this.isTickerAlreadyUse()) {
         this.tickerError = true;
         return;
