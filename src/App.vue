@@ -9,7 +9,7 @@
             v-model="currentTicker"
             :hasError="tickerError"
             :helper="allTickers"
-            @addTicker="addTicker"
+            @add="addTickerHandler"
           />
 
           <FilterTicker

@@ -52,7 +52,7 @@ export default {
   mixins: [inputInterface],
   methods: {
     addTicker() {
-      this.$emit('addTicker');
+      this.$emit('add');
       this.$nextTick(this.$emit('update:modelValue', ''));
     },
     inputHandler(v) {
