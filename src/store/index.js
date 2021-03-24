@@ -1,19 +1,15 @@
 import { createStore } from 'vuex';
-import { loadTickers, loadTickersNames } from '@/api';
+import { loadTickersNames, subscribeToUpdateTicker } from '@/api';
 
-export default createStore({
+const store = createStore({
   state: {
     currencies: [],
     currenciesHistoryData: [],
-    tickers: [],
+    tickersHelper: [],
+    tickers: new Map(),
   },
   getters: {
-    getCurrByBase: ({ currencies }) => (base) =>
-      currencies.find(([t]) => t === base),
-    getFiltredCurrencies: ({ currencies }) => (ticker) =>
-      currencies.filter(([base]) => (ticker ? base.includes(ticker) : true)),
-    getHistoryByCurrBase: ({ currenciesHistoryData }) => (currBase) =>
-      currenciesHistoryData.find(({ base }) => base === currBase)?.values,
+    getTickers: ({ tickers }) => Array.from(tickers),
   },
   mutations: {
     setCurrencies(state, payload) {
@@ -40,22 +36,24 @@ export default createStore({
         });
       });
     },
-    setTickers(state, payload) {
-      state.tickers = Object.keys(payload);
+    setTickersHelper(state, payload) {
+      state.tickersHelper = Object.keys(payload);
+    },
+    setTicker(state, { ticker, price }) {
+      state.tickers.set(ticker, price);
     },
   },
   actions: {
-    async loadCurrencies({ commit }, { bases, nominals }) {
-      await loadTickers(bases, nominals).then((currs) => {
-        commit('setCurrencies', currs);
-        commit('addHistory', currs);
-      });
-    },
     async loadTickersNames({ commit }) {
       await loadTickersNames().then(({ data: { Data } }) => {
-        commit('setTickers', Data);
+        commit('setTickersHelper', Data);
       });
+    },
+    subscribeToTicker({ commit }, ticker) {
+      subscribeToUpdateTicker(ticker, (data) => commit('setTicker', data));
     },
   },
   modules: {},
 });
+
+export default store;

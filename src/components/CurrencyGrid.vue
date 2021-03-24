@@ -2,22 +2,22 @@
   <dl class="grid grid-cols-1 gap-5 sm:grid-cols-3">
     <div
       v-for="t in currencies"
-      :key="t.curr"
-      @click="clickHandler(t.curr)"
-      :class="{ 'border-4': t.curr === current }"
+      :key="t.ticker"
+      @click="clickHandler(t.ticker)"
+      :class="{ 'border-4': t.ticker === current }"
       class="bg-white overflow-hidden shadow rounded-lg border-purple-800 border-solid cursor-pointer"
     >
       <div class="px-4 py-5 sm:p-6 text-center">
         <dt class="text-sm font-medium text-gray-500 truncate">
-          {{ t.curr }}
+          {{ t.ticker }}
         </dt>
         <dd class="mt-1 text-3xl font-semibold text-gray-900">
-          {{ currencyFilter(Number(t.value)) }}
+          {{ currencyFilter(Number(t.price)) }}
         </dd>
       </div>
       <div class="w-full border-t border-gray-200"></div>
       <button
-        @click.stop="deleteHandler(t.curr)"
+        @click.stop="deleteHandler(t.ticker)"
         class="flex items-center justify-center font-medium w-full bg-gray-100 px-4 py-4 sm:px-6 text-md text-gray-500 hover:text-gray-600 hover:bg-gray-200 hover:opacity-20 transition-all focus:outline-none"
       >
         <svg

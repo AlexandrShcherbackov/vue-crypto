@@ -73,13 +73,9 @@ export default {
     return {
       currentTicker: '',
       currentCurr: '',
-      tickers: {
-        bases: ['BTC', 'ETH'],
-        nominals: ['USD', 'EUR'],
-      },
-      excludeTickers: [],
+      tickers: ['BTC', 'ETH'],
       loadData: null,
-      isLoading: true,
+      isLoading: false,
       tickerError: false,
       tickerFilter: '',
       currentPage: 0,
@@ -90,38 +86,20 @@ export default {
     this.initializeData();
   },
   async mounted() {
-    await this.loadCurrencies(this.tickers);
-    await this.loadTickersNames();
-    await this.subscribeToUpdates();
+    //await this.loadCurrencies(this.tickers);
   },
-  unmounted() {
-    clearInterval(this.loadData);
-  },
+  unmounted() {},
   computed: {
     ...mapState({
-      allTickers: 'tickers',
+      allTickers: 'tickersHelper',
     }),
+
     ...mapGetters({
-      getFiltredCurrencies: 'getFiltredCurrencies',
-      currenciesHistory: 'getHistoryByCurrBase',
-      getCurrByBase: 'getCurrByBase',
+      observedTickers: 'getTickers',
     }),
 
     currsForRender() {
-      return this.getFiltredCurrencies(this.tickerFilter.toUpperCase()).flatMap(
-        ([base, nominals]) =>
-          Object.keys(nominals)
-            .filter(
-              (k) =>
-                !this.excludeTickers.find(
-                  ({ base: b, nominal }) => b === base && nominal === k
-                )
-            )
-            .map((k) => ({
-              curr: `${base} - ${k}`,
-              value: nominals[k],
-            }))
-      );
+      return this.observedTickers.map(([ticker, price]) => ({ ticker, price }));
     },
 
     currentPageCurrs() {
@@ -148,20 +126,7 @@ export default {
   watch: {
     tickers: {
       deep: true,
-      async handler(v) {
-        await this.loadCurrencies(v);
-        await this.subscribeToUpdates();
-      },
-    },
-
-    excludeTickers: {
-      deep: true,
-      handler() {
-        localStorage.setItem(
-          'crypto-excluded',
-          JSON.stringify(this.excludeTickers)
-        );
-      },
+      async handler() {},
     },
 
     tickerFilter() {
@@ -186,35 +151,15 @@ export default {
     ...mapActions({
       loadCurrencies: 'loadCurrencies',
       loadTickersNames: 'loadTickersNames',
+      subscribeToTicker: 'subscribeToTicker',
     }),
 
-    isTickerAlreadyUse() {
-      return (
-        !!this.getCurrByBase(this.currentTicker.toUpperCase()) &&
-        !this.excludeTickers.find(
-          ({ base }) => base === this.currentTicker.toUpperCase()
-        )
-      );
-    },
-
     addTickerHandler() {
-      if (this.isTickerAlreadyUse()) {
-        this.tickerError = true;
-        return;
-      }
-
-      this.tickerError = false;
-      this.tickers.bases.push(this.currentTicker);
-      this.excludeTickers = this.excludeTickers.filter(
-        ({ base }) => base !== this.currentTicker.toUpperCase()
-      );
-      localStorage.setItem('crypto-tickers', JSON.stringify(this.tickers));
+      // const currs = ['USD', 'EUR', 'RUB'];
+      this.subscribeToTicker(this.currentTicker.toUpperCase());
     },
 
     deleteHandler(delCurr) {
-      const [base, nominal] = delCurr.split(' - ');
-      this.excludeTickers.push({ base, nominal });
-
       if (this.currentCurr === delCurr) {
         this.closeGrapHandler();
       }
@@ -249,16 +194,8 @@ export default {
 
     initializeData() {
       const tickers = JSON.parse(localStorage.getItem('crypto-tickers'));
-      const excludeTickers = JSON.parse(
-        localStorage.getItem('crypto-excluded')
-      );
-
       if (tickers) {
         this.tickers = tickers;
-      }
-
-      if (excludeTickers) {
-        this.excludeTickers = excludeTickers;
       }
     },
   },
